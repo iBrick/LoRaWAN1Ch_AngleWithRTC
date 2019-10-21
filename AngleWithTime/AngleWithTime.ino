@@ -10,13 +10,15 @@
 
 MPU6050 mpu;
 float  Roll;
+bool needSend = false;
+short sendCounter = 0;
 int accel_power_pin = A0;
 // Init the DS3231 using the hardware interface
 DS3231  rtc(8, 9);
 int rtc_power_pin = 3;
 volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin has gone high
 
-#define DEBUG
+//#define DEBUG
 #ifdef DEBUG
 //#define DPRINT(args...)  Serial.print(args)             //OR use the following syntax:
 #define DPRINTSTIMER(t)    for (static unsigned long SpamTimer; (unsigned long)(millis() - SpamTimer) >= (t); SpamTimer = millis())
@@ -51,7 +53,7 @@ static osjob_t sendjob;
 boolean dosend = false;
 
 // Schedule TX every this many seconds
-const unsigned TX_INTERVAL = 1;
+const unsigned TX_INTERVAL = 2;
 
 // Pin mapping
 const lmic_pinmap lmic_pins = {
@@ -60,6 +62,17 @@ const lmic_pinmap lmic_pins = {
     .rst = 0,
     .dio = {4, 5, 7},
 };
+// ================================================================
+// ===               INTERRUPT DETECTION ROUTINE                ===
+// ================================================================
+
+void dmpDataReady() {
+  mpuInterrupt = true;
+}
+void mpu_set_sleep_ability( boolean able ) {
+  if (able) detachInterrupt(digitalPinToInterrupt(2));
+  else attachInterrupt(0, dmpDataReady, RISING); //pin 2 on the Uno
+}
 
 void onEvent (ev_t ev) {
     //Serial.print(os_getTime());
@@ -84,6 +97,16 @@ void onEvent (ev_t ev) {
             for (int i=0; i<13; i++) {pinMode(i, OUTPUT);digitalWrite(i, LOW);}
             pinMode(A0, OUTPUT);digitalWrite(A0, LOW);
             for (int i=0; i< 1; i++) LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
+            for (int i=0; i< 1; i++) LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
+            for (int i=0; i< 1; i++) LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
+            for (int i=0; i< 1; i++) LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
+            for (int i=0; i< 1; i++) LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
+            for (int i=0; i< 1; i++) LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
+            for (int i=0; i< 1; i++) LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
+            for (int i=0; i< 1; i++) LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
+            for (int i=0; i< 1; i++) LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
+            for (int i=0; i< 1; i++) LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
+            for (int i=0; i< 1; i++) LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
             mpu_set_sleep_ability( false );
             
             break;
@@ -93,6 +116,13 @@ void onEvent (ev_t ev) {
             //Serial.println(F("Unknown event"));
             break;
     }
+}
+
+void printHex(uint8_t num) {
+  char hexCar[2];
+
+  sprintf(hexCar, "%02X", num);
+  Serial.print(hexCar);
 }
 
 void do_send(osjob_t* j){
@@ -118,7 +148,7 @@ void do_send(osjob_t* j){
            digitalWrite(2, LOW);  
         }
         //Serial.print(F("Roll to Send="));
-        //Serial.println(Roll);
+        Serial.println(Roll);
         LoraMessage message;
         message.addTemperature(Roll);
         
@@ -136,7 +166,11 @@ void do_send(osjob_t* j){
         //Serial.println(rtc.getUnixTime(rtc.getTime()));
         message.addUnixtime(rtc.getUnixTime(rtc.getTime()));
         digitalWrite(rtc_power_pin, LOW);
-            
+
+        /*int i;
+        for(i=0; i<sizeof(message); i++){
+          printHex(message[i]);
+        } */ 
         // Prepare upstream data transmission at the next possible time.
         //LMIC_setTxData2(1, (uint8_t *)(&Roll), sizeof(float), 0);
         LMIC_setTxData2(78, message.getBytes(), message.getLength(), 0); //u1_t port, xref2u1_t data, u1_t dlen, u1_t confirmed
@@ -164,13 +198,7 @@ void i2cSetup() {
 #endif
 }
 
-// ================================================================
-// ===               INTERRUPT DETECTION ROUTINE                ===
-// ================================================================
 
-void dmpDataReady() {
-  mpuInterrupt = true;
-}
 
 // ================================================================
 // ===                      MPU DMP SETUP                       ===
@@ -239,10 +267,7 @@ void MPU6050Connect() {
   mpuInterrupt = false; // wait for next interrupt
 }
 
-void mpu_set_sleep_ability( boolean able ) {
-  if (able) detachInterrupt(digitalPinToInterrupt(2));
-  else attachInterrupt(0, dmpDataReady, RISING); //pin 2 on the Uno
-}
+
 // ================================================================
 // ===                    MPU DMP Get Data                      ===
 // ================================================================
@@ -272,6 +297,19 @@ void MPUMath() {
   mpu.dmpGetQuaternion(&q, fifoBuffer);
   mpu.dmpGetEuler(euler, &q);
   Roll = (euler[2] *  180.0 / M_PI);
+  
+  if (Roll > 30 || Roll < -30) { // send message Alarm in case angle more than 30 degrees!
+    needSend = true;
+    sendCounter = 0;
+  } else {
+    sendCounter=sendCounter+1;
+    if (sendCounter > 14) {     // send periodic message (1 in 15 minutes) if angle is lower than 30 needSend = false;
+      needSend = true;
+      sendCounter = 0;
+    } else {
+      needSend = false;
+    }
+  }
   
     DPRINTSTIMER(100) {
       DPRINTSFN(15, "\tRoll MPU:", Roll, 6, 1);
