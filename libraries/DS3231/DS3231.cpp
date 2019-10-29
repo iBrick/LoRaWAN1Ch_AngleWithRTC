@@ -272,9 +272,9 @@ char *DS3231::getDateStr(uint8_t slformat, uint8_t eformat, char divider)
 
 char *DS3231::getDOWStr(uint8_t format)
 {
-	char *output = "xxxxxxxxxx";
-	char *daysLong[]  = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
-	char *daysShort[] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+	const char *output = "xxxxxxxxxx";
+	const char *daysLong[]  = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+	const char *daysShort[] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 	Time t;
 	t=getTime();
 	if (format == FORMAT_SHORT)
@@ -287,8 +287,8 @@ char *DS3231::getDOWStr(uint8_t format)
 char *DS3231::getMonthStr(uint8_t format)
 {
 	char *output= "xxxxxxxxx";
-	char *monthLong[]  = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-	char *monthShort[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+	const char *monthLong[]  = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+	const char *monthShort[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 	Time t;
 	t=getTime();
 	if (format == FORMAT_SHORT)
