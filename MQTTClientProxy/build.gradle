@@ -1,0 +1,26 @@
+version '1.1'
+
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = "ru.lpwa.lora.MQTTClientProxy"
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+// https://mvnrepository.com/artifact/org.eclipse.paho/org.eclipse.paho.client.mqttv3
+
+dependencies {
+
+    compile files('libs/json-20160810.jar', 'libs/org.eclipse.paho.client.mqttv3-1.2.2.jar', 'libs/postgresql-9.4.1212.jar',
+            'libs/influxdb-java-2.7.jar', 'libs/log4j-core-2.10.0.jar', 'log4j-api-2.10.0.jar', 'libs/kafka-clients-2.1.0.jar',
+        'libs/protobuf-java-3.6.1.jar', 'libs/slf4j-api-1.7.25.jar', 'libs/bcprov-ext-jdk15on-161.jar')
+    compile fileTree(dir: 'libs', include: '*.jar')
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+
+jar {
+    manifest.attributes("Main-Class": mainClassName)
+}
+

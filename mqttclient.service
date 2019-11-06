@@ -1,0 +1,13 @@
+[Unit] 
+Description=InnoLabs MQTT Client
+After=lora-gateway-bridge.service
+
+[Service] 
+WorkingDirectory=/home/pi/MQTTClientProxy/bin 
+ExecStart=/home/pi/MQTTClientProxy/bin/MQTTClientProxy -config settings.properties
+SyslogIdentifier=mqttclient
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target 

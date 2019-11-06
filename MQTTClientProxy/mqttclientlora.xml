@@ -1,0 +1,617 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="mqttclientlora" default="all">
+  
+  
+  <property file="mqttclientlora.properties"/>
+  <!-- Uncomment the following property if no tests compilation is needed -->
+  <!-- 
+  <property name="skip.tests" value="true"/>
+   -->
+  
+  <!-- Compiler options -->
+  
+  <property name="compiler.debug" value="on"/>
+  <property name="compiler.generate.no.warnings" value="off"/>
+  <property name="compiler.args" value=""/>
+  <property name="compiler.max.memory" value="700m"/>
+  <patternset id="ignored.files">
+    <exclude name="**/*.hprof/**"/>
+    <exclude name="**/*.pyc/**"/>
+    <exclude name="**/*.pyo/**"/>
+    <exclude name="**/*.rbc/**"/>
+    <exclude name="**/*.yarb/**"/>
+    <exclude name="**/*~/**"/>
+    <exclude name="**/.DS_Store/**"/>
+    <exclude name="**/.git/**"/>
+    <exclude name="**/.hg/**"/>
+    <exclude name="**/.svn/**"/>
+    <exclude name="**/CVS/**"/>
+    <exclude name="**/__pycache__/**"/>
+    <exclude name="**/_svn/**"/>
+    <exclude name="**/vssver.scc/**"/>
+    <exclude name="**/vssver2.scc/**"/>
+  </patternset>
+  <patternset id="library.patterns">
+    <include name="*.war"/>
+    <include name="*.swc"/>
+    <include name="*.zip"/>
+    <include name="*.egg"/>
+    <include name="*.ane"/>
+    <include name="*.jar"/>
+    <include name="*.ear"/>
+  </patternset>
+  <patternset id="compiler.resources">
+    <exclude name="**/?*.java"/>
+    <exclude name="**/?*.form"/>
+    <exclude name="**/?*.class"/>
+    <exclude name="**/?*.groovy"/>
+    <exclude name="**/?*.scala"/>
+    <exclude name="**/?*.flex"/>
+    <exclude name="**/?*.kt"/>
+    <exclude name="**/?*.clj"/>
+    <exclude name="**/?*.aj"/>
+  </patternset>
+  
+  <!-- JDK definitions -->
+  
+  <property name="jdk.bin.1.8" value="${jdk.home.1.8}/bin"/>
+  <path id="jdk.classpath.1.8">
+    <fileset dir="${jdk.home.1.8}">
+      <include name="jre/lib/charsets.jar"/>
+      <include name="jre/lib/deploy.jar"/>
+      <include name="jre/lib/ext/access-bridge-64.jar"/>
+      <include name="jre/lib/ext/cldrdata.jar"/>
+      <include name="jre/lib/ext/dnsns.jar"/>
+      <include name="jre/lib/ext/jaccess.jar"/>
+      <include name="jre/lib/ext/jfxrt.jar"/>
+      <include name="jre/lib/ext/localedata.jar"/>
+      <include name="jre/lib/ext/nashorn.jar"/>
+      <include name="jre/lib/ext/sunec.jar"/>
+      <include name="jre/lib/ext/sunjce_provider.jar"/>
+      <include name="jre/lib/ext/sunmscapi.jar"/>
+      <include name="jre/lib/ext/sunpkcs11.jar"/>
+      <include name="jre/lib/ext/zipfs.jar"/>
+      <include name="jre/lib/javaws.jar"/>
+      <include name="jre/lib/jce.jar"/>
+      <include name="jre/lib/jfr.jar"/>
+      <include name="jre/lib/jfxswt.jar"/>
+      <include name="jre/lib/jsse.jar"/>
+      <include name="jre/lib/management-agent.jar"/>
+      <include name="jre/lib/plugin.jar"/>
+      <include name="jre/lib/resources.jar"/>
+      <include name="jre/lib/rt.jar"/>
+    </fileset>
+  </path>
+  
+  <property name="project.jdk.home" value="${jdk.home.1.8}"/>
+  <property name="project.jdk.bin" value="${jdk.bin.1.8}"/>
+  <property name="project.jdk.classpath" value="jdk.classpath.1.8"/>
+  
+  
+  <!-- Project Libraries -->
+  
+  <path id="library.gradle:_junit:junit:4.11.classpath">
+    <pathelement location="${basedir}/Cannot resolve external dependency junit:junit:4.11 because no repositories are defined."/>
+  </path>
+  <!-- Register Custom Compiler Taskdefs -->
+  <property name="javac2.home" value="${idea.home}/lib"/>
+  <path id="javac2.classpath">
+    <fileset dir="${javac2.home}">
+      <include name="javac2.jar"/>
+      <include name="jdom.jar"/>
+      <include name="asm-all*.jar"/>
+      <include name="forms-*.jar"/>
+    </fileset>
+  </path>
+  <target name="register.custom.compilers">
+    <taskdef name="javac2" classname="com.intellij.ant.Javac2" classpathref="javac2.classpath"/>
+    <taskdef name="instrumentIdeaExtensions" classname="com.intellij.ant.InstrumentIdeaExtensions" classpathref="javac2.classpath"/>
+  </target>
+  
+  <!-- Modules -->
+  
+  
+  <!-- Module MQTTClientLoRa -->
+  
+  <dirname property="module.mqttclientlora.basedir" file="${ant.file}"/>
+  
+  
+  <property name="module.jdk.home.mqttclientlora" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.mqttclientlora" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.mqttclientlora" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.mqttclientlora" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="mqttclientlora.output.dir" value="${module.mqttclientlora.basedir}/out/production/MQTTClientLoRa"/>
+  <property name="mqttclientlora.testoutput.dir" value="${module.mqttclientlora.basedir}/out/test/MQTTClientLoRa"/>
+  
+  <path id="mqttclientlora.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="mqttclientlora.module.production.classpath">
+    <path refid="${module.jdk.classpath.mqttclientlora}"/>
+  </path>
+  
+  <path id="mqttclientlora.runtime.production.module.classpath">
+    <pathelement location="${mqttclientlora.output.dir}"/>
+  </path>
+  
+  <path id="mqttclientlora.module.classpath">
+    <path refid="${module.jdk.classpath.mqttclientlora}"/>
+    <pathelement location="${mqttclientlora.output.dir}"/>
+  </path>
+  
+  <path id="mqttclientlora.runtime.module.classpath">
+    <pathelement location="${mqttclientlora.testoutput.dir}"/>
+    <pathelement location="${mqttclientlora.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.mqttclientlora">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.mqttclientlora">
+    <patternset refid="excluded.from.module.mqttclientlora"/>
+  </patternset>
+  
+  
+  <target name="compile.module.mqttclientlora" depends="compile.module.mqttclientlora.production,compile.module.mqttclientlora.tests" description="Compile module MQTTClientLoRa"/>
+  
+  <target name="compile.module.mqttclientlora.production" depends="register.custom.compilers" description="Compile module MQTTClientLoRa; production classes"/>
+  
+  <target name="compile.module.mqttclientlora.tests" depends="register.custom.compilers,compile.module.mqttclientlora.production" description="compile module MQTTClientLoRa; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.mqttclientlora" description="cleanup module">
+    <delete dir="${mqttclientlora.output.dir}"/>
+    <delete dir="${mqttclientlora.testoutput.dir}"/>
+  </target>
+  
+  
+  <!-- Module MQTTClientLoRa_main -->
+  
+  <dirname property="module.mqttclientlora_main.basedir" file="${ant.file}"/>
+  
+  
+  <property name="module.jdk.home.mqttclientlora_main" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.mqttclientlora_main" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.mqttclientlora_main" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.mqttclientlora_main" value="-encoding UTF-8 -source 8 -target 1.8 ${compiler.args}"/>
+  
+  <property name="mqttclientlora_main.output.dir" value="${module.mqttclientlora_main.basedir}/out/production/classes"/>
+  <property name="mqttclientlora_main.testoutput.dir" value="${module.mqttclientlora_main.basedir}/out/production/classes"/>
+  
+  <path id="mqttclientlora_main.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="mqttclientlora_main.module.production.classpath">
+    <path refid="${module.jdk.classpath.mqttclientlora_main}"/>
+    <pathelement location="${basedir}/libs/okio-1.11.0.jar"/>
+    <pathelement location="${basedir}/libs/protobuf-java-3.6.1.jar"/>
+    <pathelement location="${basedir}/libs/org.osgi.core-6.0.0.jar"/>
+    <pathelement location="${basedir}/libs/kafka_2.12-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/influxdb-java-2.7.jar"/>
+    <pathelement location="${basedir}/libs/postgresql-9.4.1212.jar"/>
+    <pathelement location="${basedir}/libs/kafka-clients-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/protobuf-java-3.6.1-javadoc.jar"/>
+    <pathelement location="${basedir}/libs/log4j-api-2.10.0.jar"/>
+    <pathelement location="${basedir}/libs/retrofit-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/converter-moshi-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/okhttp-3.5.0.jar"/>
+    <pathelement location="${basedir}/libs/moshi-1.3.1.jar"/>
+    <pathelement location="${basedir}/libs/logging-interceptor-3.5.0.jar"/>
+    <pathelement location="${basedir}/libs/guava-21.0.jar"/>
+    <pathelement location="${basedir}/libs/org.eclipse.paho.client.mqttv3-1.1.0.jar"/>
+    <pathelement location="${basedir}/libs/kafka-tools-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/kafka-streams-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/json-20160810.jar"/>
+    <pathelement location="${basedir}/libs/log4j-core-2.10.0.jar"/>
+    <pathelement location="${basedir}/libs/protobuf-java-3.6.1-sources.jar"/>
+    <pathelement location="${basedir}/log4j-api-2.10.0.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-api-1.7.25.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-ext-1.7.25.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-log4j12-1.7.25.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-simple-1.7.25.jar"/>
+  </path>
+  
+  <path id="mqttclientlora_main.runtime.production.module.classpath">
+    <pathelement location="${mqttclientlora_main.output.dir}"/>
+    <pathelement location="${basedir}/libs/okio-1.11.0.jar"/>
+    <pathelement location="${basedir}/libs/protobuf-java-3.6.1.jar"/>
+    <pathelement location="${basedir}/libs/org.osgi.core-6.0.0.jar"/>
+    <pathelement location="${basedir}/libs/kafka_2.12-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/influxdb-java-2.7.jar"/>
+    <pathelement location="${basedir}/libs/postgresql-9.4.1212.jar"/>
+    <pathelement location="${basedir}/libs/kafka-clients-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/protobuf-java-3.6.1-javadoc.jar"/>
+    <pathelement location="${basedir}/libs/log4j-api-2.10.0.jar"/>
+    <pathelement location="${basedir}/libs/retrofit-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/converter-moshi-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/okhttp-3.5.0.jar"/>
+    <pathelement location="${basedir}/libs/moshi-1.3.1.jar"/>
+    <pathelement location="${basedir}/libs/logging-interceptor-3.5.0.jar"/>
+    <pathelement location="${basedir}/libs/guava-21.0.jar"/>
+    <pathelement location="${basedir}/libs/org.eclipse.paho.client.mqttv3-1.1.0.jar"/>
+    <pathelement location="${basedir}/libs/kafka-tools-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/kafka-streams-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/json-20160810.jar"/>
+    <pathelement location="${basedir}/libs/log4j-core-2.10.0.jar"/>
+    <pathelement location="${basedir}/libs/protobuf-java-3.6.1-sources.jar"/>
+    <pathelement location="${basedir}/log4j-api-2.10.0.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-api-1.7.25.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-ext-1.7.25.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-log4j12-1.7.25.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-simple-1.7.25.jar"/>
+  </path>
+  
+  <path id="mqttclientlora_main.module.classpath">
+    <path refid="${module.jdk.classpath.mqttclientlora_main}"/>
+    <pathelement location="${mqttclientlora_main.output.dir}"/>
+    <pathelement location="${basedir}/libs/okio-1.11.0.jar"/>
+    <pathelement location="${basedir}/libs/protobuf-java-3.6.1.jar"/>
+    <pathelement location="${basedir}/libs/org.osgi.core-6.0.0.jar"/>
+    <pathelement location="${basedir}/libs/kafka_2.12-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/influxdb-java-2.7.jar"/>
+    <pathelement location="${basedir}/libs/postgresql-9.4.1212.jar"/>
+    <pathelement location="${basedir}/libs/kafka-clients-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/protobuf-java-3.6.1-javadoc.jar"/>
+    <pathelement location="${basedir}/libs/log4j-api-2.10.0.jar"/>
+    <pathelement location="${basedir}/libs/retrofit-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/converter-moshi-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/okhttp-3.5.0.jar"/>
+    <pathelement location="${basedir}/libs/moshi-1.3.1.jar"/>
+    <pathelement location="${basedir}/libs/logging-interceptor-3.5.0.jar"/>
+    <pathelement location="${basedir}/libs/guava-21.0.jar"/>
+    <pathelement location="${basedir}/libs/org.eclipse.paho.client.mqttv3-1.1.0.jar"/>
+    <pathelement location="${basedir}/libs/kafka-tools-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/kafka-streams-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/json-20160810.jar"/>
+    <pathelement location="${basedir}/libs/log4j-core-2.10.0.jar"/>
+    <pathelement location="${basedir}/libs/protobuf-java-3.6.1-sources.jar"/>
+    <pathelement location="${basedir}/log4j-api-2.10.0.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-api-1.7.25.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-ext-1.7.25.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-log4j12-1.7.25.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-simple-1.7.25.jar"/>
+  </path>
+  
+  <path id="mqttclientlora_main.runtime.module.classpath">
+    <pathelement location="${mqttclientlora_main.output.dir}"/>
+    <pathelement location="${basedir}/libs/okio-1.11.0.jar"/>
+    <pathelement location="${basedir}/libs/protobuf-java-3.6.1.jar"/>
+    <pathelement location="${basedir}/libs/org.osgi.core-6.0.0.jar"/>
+    <pathelement location="${basedir}/libs/kafka_2.12-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/influxdb-java-2.7.jar"/>
+    <pathelement location="${basedir}/libs/postgresql-9.4.1212.jar"/>
+    <pathelement location="${basedir}/libs/kafka-clients-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/protobuf-java-3.6.1-javadoc.jar"/>
+    <pathelement location="${basedir}/libs/log4j-api-2.10.0.jar"/>
+    <pathelement location="${basedir}/libs/retrofit-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/converter-moshi-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/okhttp-3.5.0.jar"/>
+    <pathelement location="${basedir}/libs/moshi-1.3.1.jar"/>
+    <pathelement location="${basedir}/libs/logging-interceptor-3.5.0.jar"/>
+    <pathelement location="${basedir}/libs/guava-21.0.jar"/>
+    <pathelement location="${basedir}/libs/org.eclipse.paho.client.mqttv3-1.1.0.jar"/>
+    <pathelement location="${basedir}/libs/kafka-tools-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/kafka-streams-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/json-20160810.jar"/>
+    <pathelement location="${basedir}/libs/log4j-core-2.10.0.jar"/>
+    <pathelement location="${basedir}/libs/protobuf-java-3.6.1-sources.jar"/>
+    <pathelement location="${basedir}/log4j-api-2.10.0.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-api-1.7.25.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-ext-1.7.25.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-log4j12-1.7.25.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-simple-1.7.25.jar"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.mqttclientlora_main">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.mqttclientlora_main">
+    <patternset refid="excluded.from.module.mqttclientlora_main"/>
+  </patternset>
+  
+  <path id="mqttclientlora_main.module.sourcepath">
+    <dirset dir="${module.mqttclientlora_main.basedir}/src/main">
+      <include name="java"/>
+      <include name="resources"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.mqttclientlora_main" depends="compile.module.mqttclientlora_main.production,compile.module.mqttclientlora_main.tests" description="Compile module MQTTClientLoRa_main"/>
+  
+  <target name="compile.module.mqttclientlora_main.production" depends="register.custom.compilers" description="Compile module MQTTClientLoRa_main; production classes">
+    <mkdir dir="${mqttclientlora_main.output.dir}"/>
+    <javac2 destdir="${mqttclientlora_main.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.mqttclientlora_main}/javac">
+      <compilerarg line="${compiler.args.mqttclientlora_main}"/>
+      <bootclasspath refid="mqttclientlora_main.module.bootclasspath"/>
+      <classpath refid="mqttclientlora_main.module.production.classpath"/>
+      <src refid="mqttclientlora_main.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.mqttclientlora_main"/>
+    </javac2>
+    
+    <copy todir="${mqttclientlora_main.output.dir}">
+      <fileset dir="${module.mqttclientlora_main.basedir}/src/main/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.mqttclientlora_main.basedir}/src/main/resources">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.mqttclientlora_main.tests" depends="register.custom.compilers,compile.module.mqttclientlora_main.production" description="compile module MQTTClientLoRa_main; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.mqttclientlora_main" description="cleanup module">
+    <delete dir="${mqttclientlora_main.output.dir}"/>
+    <delete dir="${mqttclientlora_main.testoutput.dir}"/>
+  </target>
+  
+  
+  <!-- Module MQTTClientLoRa_test -->
+  
+  <dirname property="module.mqttclientlora_test.basedir" file="${ant.file}"/>
+  
+  
+  <property name="module.jdk.home.mqttclientlora_test" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.mqttclientlora_test" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.mqttclientlora_test" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.mqttclientlora_test" value="-encoding UTF-8 -source 8 -target 1.8 ${compiler.args}"/>
+  
+  <property name="mqttclientlora_test.output.dir" value="undefined"/>
+  <property name="mqttclientlora_test.testoutput.dir" value="${module.mqttclientlora_test.basedir}/out/test/classes"/>
+  
+  <path id="mqttclientlora_test.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="mqttclientlora_test.module.production.classpath">
+    <path refid="${module.jdk.classpath.mqttclientlora_test}"/>
+    <pathelement location="${basedir}/libs/logging-interceptor-3.5.0.jar"/>
+    <pathelement location="${basedir}/log4j-api-2.10.0.jar"/>
+    <pathelement location="${basedir}/libs/postgresql-9.4.1212.jar"/>
+    <pathelement location="${basedir}/libs/kafka_2.12-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/kafka-tools-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/moshi-1.3.1.jar"/>
+    <pathelement location="${basedir}/libs/kafka-clients-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/retrofit-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/okio-1.11.0.jar"/>
+    <pathelement location="${basedir}/libs/okhttp-3.5.0.jar"/>
+    <pathelement location="${basedir}/libs/kafka-streams-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/org.osgi.core-6.0.0.jar"/>
+    <pathelement location="${basedir}/libs/guava-21.0.jar"/>
+    <pathelement location="${basedir}/libs/converter-moshi-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/influxdb-java-2.7.jar"/>
+    <pathelement location="${basedir}/libs/log4j-core-2.10.0.jar"/>
+    <pathelement location="${basedir}/libs/org.eclipse.paho.client.mqttv3-1.1.0.jar"/>
+    <pathelement location="${basedir}/libs/json-20160810.jar"/>
+    <pathelement location="${basedir}/libs/log4j-api-2.10.0.jar"/>
+    <path refid="library.gradle:_junit:junit:4.11.classpath"/>
+    <pathelement location="${basedir}/libs/protobuf-java-3.6.1-javadoc.jar"/>
+    <pathelement location="${basedir}/libs/protobuf-java-3.6.1-sources.jar"/>
+    <pathelement location="${basedir}/libs/protobuf-java-3.6.1.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-api-1.7.25.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-ext-1.7.25.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-log4j12-1.7.25.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-simple-1.7.25.jar"/>
+  </path>
+  
+  <path id="mqttclientlora_test.runtime.production.module.classpath">
+    <pathelement location="${basedir}/libs/logging-interceptor-3.5.0.jar"/>
+    <pathelement location="${basedir}/log4j-api-2.10.0.jar"/>
+    <pathelement location="${basedir}/libs/postgresql-9.4.1212.jar"/>
+    <pathelement location="${basedir}/libs/kafka_2.12-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/kafka-tools-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/moshi-1.3.1.jar"/>
+    <pathelement location="${basedir}/libs/kafka-clients-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/retrofit-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/okio-1.11.0.jar"/>
+    <pathelement location="${basedir}/libs/okhttp-3.5.0.jar"/>
+    <pathelement location="${basedir}/libs/kafka-streams-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/org.osgi.core-6.0.0.jar"/>
+    <pathelement location="${basedir}/libs/guava-21.0.jar"/>
+    <pathelement location="${basedir}/libs/converter-moshi-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/influxdb-java-2.7.jar"/>
+    <pathelement location="${basedir}/libs/log4j-core-2.10.0.jar"/>
+    <pathelement location="${basedir}/libs/org.eclipse.paho.client.mqttv3-1.1.0.jar"/>
+    <pathelement location="${basedir}/libs/json-20160810.jar"/>
+    <pathelement location="${basedir}/libs/log4j-api-2.10.0.jar"/>
+    <path refid="library.gradle:_junit:junit:4.11.classpath"/>
+    <pathelement location="${basedir}/libs/protobuf-java-3.6.1-javadoc.jar"/>
+    <pathelement location="${basedir}/libs/protobuf-java-3.6.1-sources.jar"/>
+    <pathelement location="${basedir}/libs/protobuf-java-3.6.1.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-api-1.7.25.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-ext-1.7.25.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-log4j12-1.7.25.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-simple-1.7.25.jar"/>
+  </path>
+  
+  <path id="mqttclientlora_test.module.classpath">
+    <path refid="${module.jdk.classpath.mqttclientlora_test}"/>
+    <pathelement location="${basedir}/libs/logging-interceptor-3.5.0.jar"/>
+    <pathelement location="${basedir}/log4j-api-2.10.0.jar"/>
+    <pathelement location="${basedir}/libs/postgresql-9.4.1212.jar"/>
+    <pathelement location="${basedir}/libs/kafka_2.12-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/kafka-tools-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/moshi-1.3.1.jar"/>
+    <pathelement location="${basedir}/libs/kafka-clients-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/retrofit-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/okio-1.11.0.jar"/>
+    <pathelement location="${basedir}/libs/okhttp-3.5.0.jar"/>
+    <pathelement location="${basedir}/libs/kafka-streams-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/org.osgi.core-6.0.0.jar"/>
+    <pathelement location="${basedir}/libs/guava-21.0.jar"/>
+    <pathelement location="${basedir}/libs/converter-moshi-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/influxdb-java-2.7.jar"/>
+    <pathelement location="${basedir}/libs/log4j-core-2.10.0.jar"/>
+    <pathelement location="${basedir}/libs/org.eclipse.paho.client.mqttv3-1.1.0.jar"/>
+    <pathelement location="${basedir}/libs/json-20160810.jar"/>
+    <pathelement location="${basedir}/libs/log4j-api-2.10.0.jar"/>
+    <path refid="library.gradle:_junit:junit:4.11.classpath"/>
+    <pathelement location="${basedir}/libs/protobuf-java-3.6.1-javadoc.jar"/>
+    <pathelement location="${basedir}/libs/protobuf-java-3.6.1-sources.jar"/>
+    <pathelement location="${basedir}/libs/protobuf-java-3.6.1.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-api-1.7.25.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-ext-1.7.25.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-log4j12-1.7.25.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-simple-1.7.25.jar"/>
+  </path>
+  
+  <path id="mqttclientlora_test.runtime.module.classpath">
+    <pathelement location="${mqttclientlora_test.testoutput.dir}"/>
+    <pathelement location="${basedir}/libs/logging-interceptor-3.5.0.jar"/>
+    <pathelement location="${basedir}/log4j-api-2.10.0.jar"/>
+    <pathelement location="${basedir}/libs/postgresql-9.4.1212.jar"/>
+    <pathelement location="${basedir}/libs/kafka_2.12-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/kafka-tools-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/moshi-1.3.1.jar"/>
+    <pathelement location="${basedir}/libs/kafka-clients-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/retrofit-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/okio-1.11.0.jar"/>
+    <pathelement location="${basedir}/libs/okhttp-3.5.0.jar"/>
+    <pathelement location="${basedir}/libs/kafka-streams-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/org.osgi.core-6.0.0.jar"/>
+    <pathelement location="${basedir}/libs/guava-21.0.jar"/>
+    <pathelement location="${basedir}/libs/converter-moshi-2.1.0.jar"/>
+    <pathelement location="${basedir}/libs/influxdb-java-2.7.jar"/>
+    <pathelement location="${basedir}/libs/log4j-core-2.10.0.jar"/>
+    <pathelement location="${basedir}/libs/org.eclipse.paho.client.mqttv3-1.1.0.jar"/>
+    <pathelement location="${basedir}/libs/json-20160810.jar"/>
+    <pathelement location="${basedir}/libs/log4j-api-2.10.0.jar"/>
+    <path refid="library.gradle:_junit:junit:4.11.classpath"/>
+    <pathelement location="${basedir}/libs/protobuf-java-3.6.1-javadoc.jar"/>
+    <pathelement location="${basedir}/libs/protobuf-java-3.6.1-sources.jar"/>
+    <pathelement location="${basedir}/libs/protobuf-java-3.6.1.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-api-1.7.25.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-ext-1.7.25.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-log4j12-1.7.25.jar"/>
+    <pathelement location="${basedir}/libs/slf4j-simple-1.7.25.jar"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.mqttclientlora_test">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.mqttclientlora_test">
+    <patternset refid="excluded.from.module.mqttclientlora_test"/>
+  </patternset>
+  
+  <path id="mqttclientlora_test.module.test.sourcepath">
+    <dirset dir="${module.mqttclientlora_test.basedir}/src/test">
+      <include name="java"/>
+      <include name="resources"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.mqttclientlora_test" depends="compile.module.mqttclientlora_test.production,compile.module.mqttclientlora_test.tests" description="Compile module MQTTClientLoRa_test"/>
+  
+  <target name="compile.module.mqttclientlora_test.production" depends="register.custom.compilers" description="Compile module MQTTClientLoRa_test; production classes"/>
+  
+  <target name="compile.module.mqttclientlora_test.tests" depends="register.custom.compilers,compile.module.mqttclientlora_test.production" description="compile module MQTTClientLoRa_test; test classes" unless="skip.tests">
+    <mkdir dir="${mqttclientlora_test.testoutput.dir}"/>
+    <javac2 destdir="${mqttclientlora_test.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.mqttclientlora_test}/javac">
+      <compilerarg line="${compiler.args.mqttclientlora_test}"/>
+      <bootclasspath refid="mqttclientlora_test.module.bootclasspath"/>
+      <classpath refid="mqttclientlora_test.module.classpath"/>
+      <src refid="mqttclientlora_test.module.test.sourcepath"/>
+      <patternset refid="excluded.from.compilation.mqttclientlora_test"/>
+    </javac2>
+    
+    <copy todir="${mqttclientlora_test.testoutput.dir}">
+      <fileset dir="${module.mqttclientlora_test.basedir}/src/test/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.mqttclientlora_test.basedir}/src/test/resources">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="clean.module.mqttclientlora_test" description="cleanup module">
+    <delete dir="${mqttclientlora_test.output.dir}"/>
+    <delete dir="${mqttclientlora_test.testoutput.dir}"/>
+  </target>
+  
+  <target name="init" description="Build initialization">
+    <!-- Perform any build initialization in this target -->
+  </target>
+  
+  <target name="clean" depends="clean.module.mqttclientlora, clean.module.mqttclientlora_main, clean.module.mqttclientlora_test" description="cleanup all"/>
+  
+  <target name="build.modules" depends="init, clean, compile.module.mqttclientlora, compile.module.mqttclientlora_main, compile.module.mqttclientlora_test" description="build all modules"/>
+  
+  <target name="init.artifacts">
+    <property name="artifacts.temp.dir" value="${basedir}/__artifacts_temp"/>
+    <property name="artifact.output.mqttclientlora:jar" value="${basedir}/out/artifacts/MQTTClientLoRa_jar"/>
+    <mkdir dir="${artifacts.temp.dir}"/>
+    <property name="temp.jar.path.MQTTClientLoRa.jar" value="${artifacts.temp.dir}/MQTTClientLoRa.jar"/>
+  </target>
+  
+  <target name="artifact.mqttclientlora:jar" depends="init.artifacts, compile.module.mqttclientlora_main" description="Build &#39;MQTTClientLoRa:jar&#39; artifact">
+    <property name="artifact.temp.output.mqttclientlora:jar" value="${artifacts.temp.dir}/MQTTClientLoRa_jar"/>
+    <mkdir dir="${artifact.temp.output.mqttclientlora:jar}"/>
+    <jar destfile="${temp.jar.path.MQTTClientLoRa.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
+      <zipfileset dir="${mqttclientlora_main.output.dir}"/>
+      <zipfileset src="${basedir}/libs/postgresql-9.4.1212.jar"/>
+      <zipfileset src="${basedir}/libs/kafka-streams-2.1.0.jar"/>
+      <zipfileset src="${basedir}/libs/slf4j-simple-1.7.25.jar"/>
+      <zipfileset src="${basedir}/libs/kafka-tools-2.1.0.jar"/>
+      <zipfileset src="${basedir}/libs/converter-moshi-2.1.0.jar"/>
+      <zipfileset src="${basedir}/libs/okio-1.11.0.jar"/>
+      <zipfileset src="${basedir}/libs/json-20160810.jar"/>
+      <zipfileset src="${basedir}/libs/retrofit-2.1.0.jar"/>
+      <zipfileset src="${basedir}/libs/org.eclipse.paho.client.mqttv3-1.1.0.jar"/>
+      <zipfileset src="${basedir}/libs/protobuf-java-3.6.1-javadoc.jar"/>
+      <zipfileset src="${basedir}/libs/log4j-api-2.10.0.jar"/>
+      <zipfileset src="${basedir}/libs/log4j-core-2.10.0.jar"/>
+      <zipfileset src="${basedir}/libs/kafka_2.12-2.1.0.jar"/>
+      <zipfileset src="${basedir}/libs/protobuf-java-3.6.1.jar"/>
+      <zipfileset src="${basedir}/libs/slf4j-api-1.7.25.jar"/>
+      <zipfileset src="${basedir}/libs/kafka-clients-2.1.0.jar"/>
+      <zipfileset src="${basedir}/libs/okhttp-3.5.0.jar"/>
+      <zipfileset src="${basedir}/libs/org.osgi.core-6.0.0.jar"/>
+      <zipfileset src="${basedir}/libs/protobuf-java-3.6.1-sources.jar"/>
+      <zipfileset src="${basedir}/libs/guava-21.0.jar"/>
+      <zipfileset src="${basedir}/libs/slf4j-ext-1.7.25.jar"/>
+      <zipfileset src="${basedir}/libs/influxdb-java-2.7.jar"/>
+      <zipfileset src="${basedir}/libs/moshi-1.3.1.jar"/>
+      <zipfileset src="${basedir}/libs/logging-interceptor-3.5.0.jar"/>
+    </jar>
+    <copy file="${temp.jar.path.MQTTClientLoRa.jar}" tofile="${artifact.temp.output.mqttclientlora:jar}/MQTTClientLoRa.jar"/>
+  </target>
+  
+  <target name="build.all.artifacts" depends="artifact.mqttclientlora:jar" description="Build all artifacts">
+    <mkdir dir="${artifact.output.mqttclientlora:jar}"/>
+    <copy todir="${artifact.output.mqttclientlora:jar}">
+      <fileset dir="${artifact.temp.output.mqttclientlora:jar}"/>
+    </copy>
+    
+    <!-- Delete temporary files -->
+    <delete dir="${artifacts.temp.dir}"/>
+  </target>
+
+  <target name="yguard">
+    <taskdef name="yguard"
+             classname="com.yworks.yguard.YGuardTask"
+             classpath="yguard.jar"/>
+    <yguard>
+      <!-- insert your yguard elements here -->
+    </yguard>
+  </target>
+
+  <target name="all" depends="build.modules, build.all.artifacts" description="build all"/>
+</project>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MQTTClientProxy.iml" filepath="$PROJECT_DIR$/.idea/modules/MQTTClientProxy.iml" group="MQTTClientProxy" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MQTTClientProxy_main.iml" filepath="$PROJECT_DIR$/.idea/modules/MQTTClientProxy_main.iml" group="MQTTClientProxy" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MQTTClientProxy_test.iml" filepath="$PROJECT_DIR$/.idea/modules/MQTTClientProxy_test.iml" group="MQTTClientProxy" />
+    </modules>
+  </component>
+</project>

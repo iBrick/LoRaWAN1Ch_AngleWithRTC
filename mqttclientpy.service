@@ -1,0 +1,16 @@
+[Unit]
+Description=MQTT Python Proxy
+Wants=network-online.target
+After=syslog.target
+After=network.target network-online.target
+After=lora-gateway-bridge.service
+
+[Service]
+Type=simple
+WorkingDirectory=/home/pi/
+ExecStart=/home/pi/constanrunMQTTProxy.sh
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

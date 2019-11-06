@@ -1,0 +1,16 @@
+[Unit]
+Description=GPS2MQTT Forwarder
+Wants=network-online.target
+After=syslog.target
+After=network.target network-online.target
+After=gpsd.service
+
+[Service]
+Type=simple
+WorkingDirectory=/home/pi/
+ExecStart=/home/pi/constanrun.sh
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
