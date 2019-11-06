@@ -4,7 +4,6 @@
 // Updates should (hopefully) always be available at https://github.com/jrowberg/i2cdevlib
 //
 // Changelog:
-//  2019-07-08 - Added Auto Calibration routine
 //     ... - ongoing debug release
 
 // NOTE: THIS IS ONLY A PARIAL RELEASE. THIS DEVICE CLASS IS CURRENTLY UNDERGOING ACTIVE
@@ -37,13 +36,21 @@ THE SOFTWARE.
 
 #include "MPU6050.h"
 
+/** Default constructor, uses default I2C address.
+ * @see MPU6050_DEFAULT_ADDRESS
+ */
+MPU6050::MPU6050() {
+    devAddr = MPU6050_DEFAULT_ADDRESS;
+}
+
 /** Specific address constructor.
- * @param address I2C address, uses default I2C address if none is specified
+ * @param address I2C address
  * @see MPU6050_DEFAULT_ADDRESS
  * @see MPU6050_ADDRESS_AD0_LOW
  * @see MPU6050_ADDRESS_AD0_HIGH
  */
-MPU6050::MPU6050(uint8_t address):devAddr(address) {
+MPU6050::MPU6050(uint8_t address) {
+    devAddr = address;
 }
 
 /** Power on and prepare for general usage.
@@ -244,64 +251,6 @@ uint8_t MPU6050::getFullScaleGyroRange() {
  */
 void MPU6050::setFullScaleGyroRange(uint8_t range) {
     I2Cdev::writeBits(devAddr, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_FS_SEL_BIT, MPU6050_GCONFIG_FS_SEL_LENGTH, range);
-}
-
-// SELF TEST FACTORY TRIM VALUES
-
-/** Get self-test factory trim value for accelerometer X axis.
- * @return factory trim value
- * @see MPU6050_RA_SELF_TEST_X
- */
-uint8_t MPU6050::getAccelXSelfTestFactoryTrim() {
-    I2Cdev::readByte(devAddr, MPU6050_RA_SELF_TEST_X, &buffer[0]);
-	I2Cdev::readByte(devAddr, MPU6050_RA_SELF_TEST_A, &buffer[1]);	
-    return (buffer[0]>>3) | ((buffer[1]>>4) & 0x03);
-}
-
-/** Get self-test factory trim value for accelerometer Y axis.
- * @return factory trim value
- * @see MPU6050_RA_SELF_TEST_Y
- */
-uint8_t MPU6050::getAccelYSelfTestFactoryTrim() {
-    I2Cdev::readByte(devAddr, MPU6050_RA_SELF_TEST_Y, &buffer[0]);
-	I2Cdev::readByte(devAddr, MPU6050_RA_SELF_TEST_A, &buffer[1]);	
-    return (buffer[0]>>3) | ((buffer[1]>>2) & 0x03);
-}
-
-/** Get self-test factory trim value for accelerometer Z axis.
- * @return factory trim value
- * @see MPU6050_RA_SELF_TEST_Z
- */
-uint8_t MPU6050::getAccelZSelfTestFactoryTrim() {
-    I2Cdev::readBytes(devAddr, MPU6050_RA_SELF_TEST_Z, 2, buffer);	
-    return (buffer[0]>>3) | (buffer[1] & 0x03);
-}
-
-/** Get self-test factory trim value for gyro X axis.
- * @return factory trim value
- * @see MPU6050_RA_SELF_TEST_X
- */
-uint8_t MPU6050::getGyroXSelfTestFactoryTrim() {
-    I2Cdev::readByte(devAddr, MPU6050_RA_SELF_TEST_X, buffer);	
-    return (buffer[0] & 0x1F);
-}
-
-/** Get self-test factory trim value for gyro Y axis.
- * @return factory trim value
- * @see MPU6050_RA_SELF_TEST_Y
- */
-uint8_t MPU6050::getGyroYSelfTestFactoryTrim() {
-    I2Cdev::readByte(devAddr, MPU6050_RA_SELF_TEST_Y, buffer);	
-    return (buffer[0] & 0x1F);
-}
-
-/** Get self-test factory trim value for gyro Z axis.
- * @return factory trim value
- * @see MPU6050_RA_SELF_TEST_Z
- */
-uint8_t MPU6050::getGyroZSelfTestFactoryTrim() {
-    I2Cdev::readByte(devAddr, MPU6050_RA_SELF_TEST_Z, buffer);	
-    return (buffer[0] & 0x1F);
 }
 
 // ACCEL_CONFIG register
@@ -515,7 +464,7 @@ uint8_t MPU6050::getMotionDetectionThreshold() {
     I2Cdev::readByte(devAddr, MPU6050_RA_MOT_THR, buffer);
     return buffer[0];
 }
-/** Set motion detection event acceleration threshold.
+/** Set free-fall event acceleration threshold.
  * @param threshold New motion detection acceleration threshold value (LSB = 2mg)
  * @see getMotionDetectionThreshold()
  * @see MPU6050_RA_MOT_THR
@@ -1791,6 +1740,13 @@ void MPU6050::getMotion6(int16_t* ax, int16_t* ay, int16_t* az, int16_t* gx, int
     *gy = (((int16_t)buffer[10]) << 8) | buffer[11];
     *gz = (((int16_t)buffer[12]) << 8) | buffer[13];
 }
+
+void MPU6050::getGx(int16_t* gx) {
+    I2Cdev::readBytes(devAddr, MPU6050_RA_ACCEL_XOUT_H, 14, buffer);
+    *gx = (((int16_t)buffer[8]) << 8) | buffer[9];
+}
+
+
 /** Get 3-axis accelerometer readings.
  * These registers store the most recent accelerometer measurements.
  * Accelerometer measurements are written to these registers at the Sample Rate
@@ -2041,14 +1997,6 @@ uint32_t MPU6050::getExternalSensorDWord(int position) {
 
 // MOT_DETECT_STATUS register
 
-/** Get full motion detection status register content (all bits).
- * @return Motion detection status byte
- * @see MPU6050_RA_MOT_DETECT_STATUS
- */
-uint8_t MPU6050::getMotionStatus() {
-    I2Cdev::readByte(devAddr, MPU6050_RA_MOT_DETECT_STATUS, buffer);
-    return buffer[0];
-}
 /** Get X-axis negative motion detection interrupt status.
  * @return Motion detection status
  * @see MPU6050_RA_MOT_DETECT_STATUS
@@ -2553,7 +2501,7 @@ void MPU6050::setClockSource(uint8_t source) {
  * 1            | 2.5 Hz
  * 2            | 5 Hz
  * 3            | 10 Hz
- * </pre>
+ * <pre>
  *
  * For further information regarding the MPU-60X0's power modes, please refer to
  * Register 107.
@@ -2734,11 +2682,7 @@ uint8_t MPU6050::getFIFOByte() {
     return buffer[0];
 }
 void MPU6050::getFIFOBytes(uint8_t *data, uint8_t length) {
-    if(length > 0){
-        I2Cdev::readBytes(devAddr, MPU6050_RA_FIFO_R_W, length, data);
-    } else {
-    	*data = 0;
-    }
+    I2Cdev::readBytes(devAddr, MPU6050_RA_FIFO_R_W, length, data);
 }
 /** Write byte to FIFO buffer.
  * @see getFIFOByte()
@@ -2846,37 +2790,31 @@ void MPU6050::setZFineGain(int8_t gain) {
 // XA_OFFS_* registers
 
 int16_t MPU6050::getXAccelOffset() {
-	uint8_t SaveAddress = ((getDeviceID() < 0x38 )? MPU6050_RA_XA_OFFS_H:0x77); // MPU6050,MPU9150 Vs MPU6500,MPU9250
-	I2Cdev::readBytes(devAddr, SaveAddress, 2, buffer);
-	return (((int16_t)buffer[0]) << 8) | buffer[1];
+    I2Cdev::readBytes(devAddr, MPU6050_RA_XA_OFFS_H, 2, buffer);
+    return (((int16_t)buffer[0]) << 8) | buffer[1];
 }
 void MPU6050::setXAccelOffset(int16_t offset) {
-	uint8_t SaveAddress = ((getDeviceID() < 0x38 )? MPU6050_RA_XA_OFFS_H:0x77); // MPU6050,MPU9150 Vs MPU6500,MPU9250
-	I2Cdev::writeWord(devAddr, SaveAddress, offset);
+    I2Cdev::writeWord(devAddr, MPU6050_RA_XA_OFFS_H, offset);
 }
 
 // YA_OFFS_* register
 
 int16_t MPU6050::getYAccelOffset() {
-	uint8_t SaveAddress = ((getDeviceID() < 0x38 )? MPU6050_RA_YA_OFFS_H:0x7A); // MPU6050,MPU9150 Vs MPU6500,MPU9250
-	I2Cdev::readBytes(devAddr, SaveAddress, 2, buffer);
-	return (((int16_t)buffer[0]) << 8) | buffer[1];
+    I2Cdev::readBytes(devAddr, MPU6050_RA_YA_OFFS_H, 2, buffer);
+    return (((int16_t)buffer[0]) << 8) | buffer[1];
 }
 void MPU6050::setYAccelOffset(int16_t offset) {
-	uint8_t SaveAddress = ((getDeviceID() < 0x38 )? MPU6050_RA_YA_OFFS_H:0x7A); // MPU6050,MPU9150 Vs MPU6500,MPU9250
-	I2Cdev::writeWord(devAddr, SaveAddress, offset);
+    I2Cdev::writeWord(devAddr, MPU6050_RA_YA_OFFS_H, offset);
 }
 
 // ZA_OFFS_* register
 
 int16_t MPU6050::getZAccelOffset() {
-	uint8_t SaveAddress = ((getDeviceID() < 0x38 )? MPU6050_RA_ZA_OFFS_H:0x7D); // MPU6050,MPU9150 Vs MPU6500,MPU9250
-	I2Cdev::readBytes(devAddr, SaveAddress, 2, buffer);
-	return (((int16_t)buffer[0]) << 8) | buffer[1];
+    I2Cdev::readBytes(devAddr, MPU6050_RA_ZA_OFFS_H, 2, buffer);
+    return (((int16_t)buffer[0]) << 8) | buffer[1];
 }
 void MPU6050::setZAccelOffset(int16_t offset) {
-	uint8_t SaveAddress = ((getDeviceID() < 0x38 )? MPU6050_RA_ZA_OFFS_H:0x7D); // MPU6050,MPU9150 Vs MPU6500,MPU9250
-	I2Cdev::writeWord(devAddr, SaveAddress, offset);
+    I2Cdev::writeWord(devAddr, MPU6050_RA_ZA_OFFS_H, offset);
 }
 
 // XG_OFFS_USR* registers
@@ -3036,8 +2974,8 @@ bool MPU6050::writeMemoryBlock(const uint8_t *data, uint16_t dataSize, uint8_t b
     setMemoryBank(bank);
     setMemoryStartAddress(address);
     uint8_t chunkSize;
-    uint8_t *verifyBuffer=0;
-    uint8_t *progBuffer=0;
+    uint8_t *verifyBuffer;
+    uint8_t *progBuffer;
     uint16_t i;
     uint8_t j;
     if (verify) verifyBuffer = (uint8_t *)malloc(MPU6050_DMP_MEMORY_CHUNK_SIZE);
@@ -3112,8 +3050,7 @@ bool MPU6050::writeProgMemoryBlock(const uint8_t *data, uint16_t dataSize, uint8
     return writeMemoryBlock(data, dataSize, bank, address, verify, true);
 }
 bool MPU6050::writeDMPConfigurationSet(const uint8_t *data, uint16_t dataSize, bool useProgMem) {
-    uint8_t *progBuffer = 0;
-	uint8_t success, special;
+    uint8_t *progBuffer, success, special;
     uint16_t i, j;
     if (useProgMem) {
         progBuffer = (uint8_t *)malloc(8); // assume 8-byte blocks, realloc later if necessary
@@ -3209,122 +3146,4 @@ uint8_t MPU6050::getDMPConfig2() {
 }
 void MPU6050::setDMPConfig2(uint8_t config) {
     I2Cdev::writeByte(devAddr, MPU6050_RA_DMP_CFG_2, config);
-}
-
-
-//***************************************************************************************
-//**********************           Calibration Routines            **********************
-//***************************************************************************************
-/**
-  @brief      Fully calibrate Gyro from ZERO in about 6-7 Loops 600-700 readings
-*/
-void MPU6050::CalibrateGyro(uint8_t Loops ) {
-  double kP = 0.3;
-  double kI = 90;
-  float x;
-  x = (100 - map(Loops, 1, 5, 20, 0)) * .01;
-  kP *= x;
-  kI *= x;
-  
-  PID( 0x43,  kP, kI,  Loops);
-}
-
-/**
-  @brief      Fully calibrate Accel from ZERO in about 6-7 Loops 600-700 readings
-*/
-void MPU6050::CalibrateAccel(uint8_t Loops ) {
-
-	float kP = 0.3;
-	float kI = 20;
-	float x;
-	x = (100 - map(Loops, 1, 5, 20, 0)) * .01;
-	kP *= x;
-	kI *= x;
-	PID( 0x3B, kP, kI,  Loops);
-}
-
-void MPU6050::PID(uint8_t ReadAddress, float kP,float kI, uint8_t Loops){
-	uint8_t SaveAddress = (ReadAddress == 0x3B)?((getDeviceID() < 0x38 )? 0x06:0x77):0x13;
-
-	int16_t  Data;
-	float Reading;
-	int16_t BitZero[3];
-	uint8_t shift =(SaveAddress == 0x77)?3:2;
-	float Error, PTerm, ITerm[3];
-	int16_t eSample;
-	uint32_t eSum ;
-	Serial.write('>');
-	for (int i = 0; i < 3; i++) {
-		I2Cdev::readWords(devAddr, SaveAddress + (i * shift), 1, (uint16_t *)&Data); // reads 1 or more 16 bit integers (Word)
-		Reading = Data;
-		if(SaveAddress != 0x13){
-			BitZero[i] = Data & 1;										 // Capture Bit Zero to properly handle Accelerometer calibration
-			ITerm[i] = ((float)Reading) * 8;
-			} else {
-			ITerm[i] = Reading * 4;
-		}
-	}
-	for (int L = 0; L < Loops; L++) {
-		eSample = 0;
-		for (int c = 0; c < 100; c++) {// 100 PI Calculations
-			eSum = 0;
-			for (int i = 0; i < 3; i++) {
-				I2Cdev::readWords(devAddr, ReadAddress + (i * 2), 1, (uint16_t *)&Data); // reads 1 or more 16 bit integers (Word)
-				Reading = Data;
-				if ((ReadAddress == 0x3B)&&(i == 2)) Reading -= 16384;	//remove Gravity
-				Error = -Reading;
-				eSum += abs(Reading);
-				PTerm = kP * Error;
-				ITerm[i] += (Error * 0.001) * kI;				// Integral term 1000 Calculations a second = 0.001
-				if(SaveAddress != 0x13){
-					Data = round((PTerm + ITerm[i] ) / 8);		//Compute PID Output
-					Data = ((Data)&0xFFFE) |BitZero[i];			// Insert Bit0 Saved at beginning
-				} else Data = round((PTerm + ITerm[i] ) / 4);	//Compute PID Output
-				I2Cdev::writeWords(devAddr, SaveAddress + (i * shift), 1, (uint16_t *)&Data);
-			}
-			if((c == 99) && eSum > 1000){						// Error is still to great to continue 
-				c = 0;
-				Serial.write('*');
-			}
-			if((eSum * ((ReadAddress == 0x3B)?.05: 1)) < 5) eSample++;	// Successfully found offsets prepare to  advance
-			if((eSum < 100) && (c > 10) && (eSample >= 10)) break;		// Advance to next Loop
-			delay(1);
-		}
-		Serial.write('.');
-		kP *= .75;
-		kI *= .75;
-		for (int i = 0; i < 3; i++){
-			if(SaveAddress != 0x13) {
-				Data = round((ITerm[i] ) / 8);		//Compute PID Output
-				Data = ((Data)&0xFFFE) |BitZero[i];	// Insert Bit0 Saved at beginning
-			} else Data = round((ITerm[i]) / 4);
-			I2Cdev::writeWords(devAddr, SaveAddress + (i * shift), 1, (uint16_t *)&Data);
-		}
-	}
-	resetFIFO();
-	resetDMP();
-}
-
-#define printfloatx(Name,Variable,Spaces,Precision,EndTxt) { Serial.print(F(Name)); {char S[(Spaces + Precision + 3)];Serial.print(F(" ")); Serial.print(dtostrf((float)Variable,Spaces,Precision ,S));}Serial.print(F(EndTxt)); }//Name,Variable,Spaces,Precision,EndTxt
-void MPU6050::PrintActiveOffsets() {
-	uint8_t AOffsetRegister = (getDeviceID() < 0x38 )? MPU6050_RA_XA_OFFS_H:0x77;
-	int16_t Data[3];
-	//Serial.print(F("Offset Register 0x"));
-	//Serial.print(AOffsetRegister>>4,HEX);Serial.print(AOffsetRegister&0x0F,HEX);
-	Serial.print(F("\n//           X Accel  Y Accel  Z Accel   X Gyro   Y Gyro   Z Gyro\n//OFFSETS   "));
-	if(AOffsetRegister == 0x06)	I2Cdev::readWords(devAddr, AOffsetRegister, 3, (uint16_t *)Data);
-	else {
-		I2Cdev::readWords(devAddr, AOffsetRegister, 1, (uint16_t *)Data);
-		I2Cdev::readWords(devAddr, AOffsetRegister+3, 1, (uint16_t *)Data+1);
-		I2Cdev::readWords(devAddr, AOffsetRegister+6, 1, (uint16_t *)Data+2);
-	}
-	//	A_OFFSET_H_READ_A_OFFS(Data);
-	printfloatx("", Data[0], 5, 0, ",  ");
-	printfloatx("", Data[1], 5, 0, ",  ");
-	printfloatx("", Data[2], 5, 0, ",  ");
-	I2Cdev::readWords(devAddr, 0x13, 3, (uint16_t *)Data);
-	//	XG_OFFSET_H_READ_OFFS_USR(Data);
-	printfloatx("", Data[0], 5, 0, ",  ");
-	printfloatx("", Data[1], 5, 0, ",  ");
-	printfloatx("", Data[2], 5, 0, "\n");
 }
