@@ -2,11 +2,13 @@ package ru.lpwa.lora;
 
 import org.eclipse.paho.client.mqttv3.*;
 import java.time.ZonedDateTime;
+import java.util.Iterator;
 
+import static ru.lpwa.lora.MQTTClientProxy.publicBrokerClient;
 import static ru.lpwa.lora.MQTTClientProxy.mqttClient;
 
 class MainMQTTCallback implements MqttCallbackExtended {
-    private final static int mqttQoS = 2;
+    private final static int mqttQoS = 1;
 
     MainMQTTCallback() {
         super();
@@ -19,7 +21,7 @@ class MainMQTTCallback implements MqttCallbackExtended {
         MQTTClientProxy.log.warn("MainMqttCallback Connection reconnect = " + reconnect);
         if(reconnect) {
             try {
-                mqttClient.subscribe(Settings.MQTT_RX_TOPIC, 2);
+                mqttClient.subscribe(Settings.MQTT_RX_TOPIC, 1);
             } catch (MqttException e) {
                 e.printStackTrace();
             }
@@ -34,7 +36,7 @@ class MainMQTTCallback implements MqttCallbackExtended {
 
         MQTTClientProxy.log.warn("MainMqttCallback Connection lost!!" );
         mqttClient = MQTTClientProxy.connectMQTTClient(Settings.LOCALRUN ? Settings.BROKER_URL_LOCAL : Settings.BROKER_URL,
-                "mqttProxyLocalClient", Settings.MQTT_USERNAME, Settings.MQTT_PASSWORD_MD5, new MainMQTTCallback());
+                "mqttProxyLocalClient", "", "", new MainMQTTCallback());
         connectComplete(true, "");
     }
 
@@ -57,9 +59,12 @@ class MainMQTTCallback implements MqttCallbackExtended {
         // subscription made by the client
         String time = ZonedDateTime.now().toString();
 
-        if (topic.startsWith("gateway")) {
-            MQTTClientProxy.log.debug("Topic:\t {}, time: {}, payload: {}", topic ,time, message.toString());
-            publish2PublicBroker(topic, message);
+        if (topic.startsWith("gateway") //&& topic.endsWith("up")
+        ) {
+            if (!topic.endsWith("down")) {
+                MQTTClientProxy.log.debug("Topic:\t {}, time: {}, payload: {}", topic, time, message.toString());
+                publish2PublicBroker(topic, message);
+            }
         }
     }
 
@@ -72,14 +77,18 @@ class MainMQTTCallback implements MqttCallbackExtended {
                     MQTTClientProxy.publicBrokerClient = MQTTClientProxy.connectMQTTClient(Settings.PUBLICBROKER,
                             "mqttProxyPublicClient", "", "", new SimpleMqttCallback());
                 }
-                if (MQTTClientProxy.publicBrokerClient.isConnected()) {
-                    for (MqttMessage message1 : MQTTClientProxy.arrayList) {
+                if (publicBrokerClient.isConnected()) {
+                    Iterator it = MQTTClientProxy.arrayList.iterator();
+                    while (it.hasNext())
+                    {
+                        MqttMessage message1 = (MqttMessage) it.next();
                         MQTTClientProxy.log.debug("Sending messages from queue");
-                        MQTTClientProxy.publicBrokerClient.publish(MQTTClientProxy.topic, message1.getPayload(),
+                        publicBrokerClient.publish(MQTTClientProxy.topic, message1.getPayload(),
                                 mqttQoS, false); // Blocking publish
+                        it.remove();
                     }
-                    MQTTClientProxy.arrayList.clear();
-                    MQTTClientProxy.publicBrokerClient.publish(topic, message.getPayload(), mqttQoS, true); // Blocking publish
+
+                    publicBrokerClient.publish(topic, message.getPayload(), mqttQoS, false); // Blocking publish
                 } else {
                     if (topic.endsWith("up"))
                         MQTTClientProxy.topic = topic;

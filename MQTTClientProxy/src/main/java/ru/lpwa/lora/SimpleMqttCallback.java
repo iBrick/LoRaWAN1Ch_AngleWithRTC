@@ -23,6 +23,6 @@ public class SimpleMqttCallback implements MqttCallback {
         // code to reconnect to the broker would go here if desired
         MQTTClientProxy.log.warn("Public MqttCallback Connection lost!!" );
         mqttClient = MQTTClientProxy.connectMQTTClient(Settings.LOCALRUN ? Settings.BROKER_URL_LOCAL : Settings.BROKER_URL,
-                "mqttProxyPublicClient", Settings.MQTT_USERNAME, Settings.MQTT_PASSWORD_MD5, new MainMQTTCallback());
+                "mqttProxyPublicClient", "", "", new MainMQTTCallback());
     }
 }

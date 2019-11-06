@@ -36,17 +36,11 @@ public class MQTTClientProxy {
 
         try {
             mqttClient = connectMQTTClient(Settings.LOCALRUN ? Settings.BROKER_URL_LOCAL : Settings.BROKER_URL,
-                    "mqttProxyLocalClient", Settings.MQTT_USERNAME, Settings.MQTT_PASSWORD_MD5, new MainMQTTCallback());
-            publicBrokerClient = MQTTClientProxy.connectMQTTClient(Settings.PUBLICBROKER,
+                    "mqttProxyLocalClient", "", "", new MainMQTTCallback());
+            publicBrokerClient = connectMQTTClient(Settings.PUBLICBROKER,
                     "mqttProxyPublicClient", "", "", new SimpleMqttCallback());
 
-            // Subscribe to the requested topic
-            // The QoS specified is the maximum level that messages will be sent to the mqttClient at.
-            // For instance if QoS 1 is specified, any messages originally published at QoS 2 will
-            // be downgraded to 1 when delivering to the mqttClient but messages published at 1 and 0
-            // will be received at the same level they were published at.
             int subQoS = 2;
-
             mqttClient.subscribe(Settings.MQTT_RX_TOPIC, subQoS);
 
             try {
@@ -55,11 +49,11 @@ public class MQTTClientProxy {
                     //do forever
                 }
             } catch(Exception e) {
+                e.printStackTrace();
                 mqttClient.disconnect();
                 if (Settings.PUBLISHPUBLIC) {
                     publicBrokerClient.disconnect();
                 }
-                e.printStackTrace();
             }
             log.info("Disconnected");
             System.exit(0);
@@ -73,11 +67,13 @@ public class MQTTClientProxy {
         }
     }
 
-    static MqttClient connectMQTTClient(String brokerURL, String clientId, String username, String password, MqttCallback mqttCallback) {
+    static MqttClient connectMQTTClient(String brokerURL, String clientId, String username,
+                                        String password, MqttCallback mqttCallback) {
         MqttClient mqttClientInt = null;
         try {
             MemoryPersistence persistence = new MemoryPersistence();
 
+            clientId = MqttClient.generateClientId();
             mqttClientInt = new MqttClient(brokerURL, clientId, persistence);
             MqttConnectOptions connOpts = new MqttConnectOptions();
             connOpts.setCleanSession(false);
